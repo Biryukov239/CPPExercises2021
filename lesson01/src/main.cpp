@@ -32,15 +32,29 @@ int main() {
     values.push_back(35);
     values.push_back(4);
     std::cout << "values size after more push_back: " << values.size() << std::endl;
+    int s;
 
     // TODO 07 выведите в консоль каждый элемент из динамического массива
     for (int i = 0; i < values.size(); ++i) {
         double x = values[i];
+        std::cout << x << std::endl;
     }
 
     // TODO 08 считывайте числа из консоли (и добавляйте их в вектор) до тех пор пока не будет введен ноль, после чего просуммируйте считанные числа и выведите сумму
-    // while () {
-    //     ...
+    int y;
+    std::cin >> y;
+    int z = 4;
+    while (y != 0) {
+        values.push_back(y);
+        z = z + 1;
+
+        for (int i; i < z; i++) {
+
+            s = s + values[i];
+        }
+    }
+
+           std::cout << s << std::endl;
     //     if (...) {
     //         break;
     //     }

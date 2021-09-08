@@ -2,6 +2,16 @@
 
 int fibbonachiRecursive(int n) {
     // TODO 03 реализуйте функцию которая считает числа Фибоначчи - https://ru.wikipedia.org/wiki/%D0%A7%D0%B8%D1%81%D0%BB%D0%B0_%D0%A4%D0%B8%D0%B1%D0%BE%D0%BD%D0%B0%D1%87%D1%87%D0%B8
+
+    if (n >= 2) {
+
+        int f;
+        int f1;
+        int f2;
+        for (int i = 1; i <= n; i++) {
+
+        }
+        }
     return 0;
 }
 
