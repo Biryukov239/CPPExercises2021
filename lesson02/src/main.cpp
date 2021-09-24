@@ -39,7 +39,7 @@ void task2() {
 
     array2d.push_back(row0);
     // TODO 23 добавьте rassert проверяющий размер этого двумерного вектора array2d, как вы считаете какого размера он должен быть?
-    rassert(row0.size() < 5, 1083542438780310);
+    rassert(row0.size() == 1, 1083542438780310);
 
     std::cout << "print2DArray(array2d):" << std::endl;
     print2DArray(array2d); // TODO 24,25: откройте соседний файл - helper_function.cpp и реализуйте там эту функцию, можете туда быстро попасть через телепорт - держите нажатым CTRL->и кликните по этой функции
@@ -52,14 +52,20 @@ void task2() {
     row1[1] = 24;
     row1[2] = 42;
     array2d.push_back(row1);
+
+    rassert(array2d.size() == 2, 1);
+    rassert(row1.size() == 3, 1);
 //    // TODO 26 добавьте два rassert-а - чтобы удостовериться что размеры двух динамических массивов которые мы только что изменили - совпадают с вашим ожиданием
 //
-//    std::cout << "print2DArray(array2d):" << std::endl;
-//    print2DArray(array2d);
+    std::cout << "print2DArray(array2d):" << std::endl;
+     print2DArray(array2d);
 //
-//    // TODO 27 добавьте еще один ряд чисел, но на этот раз из 10 чисел от 0 до 9 включительно (воспользуйтесь for-ом)
-//    // ...
-//    print2DArray(array2d);
+//    // TODO 27 добавьте еще один ряд чисел, но на этот раз из 10 чисел от 0 до 9 включительно (воспользуйтесь for-
+    std::vector<int> row2;
+    for (int i = 1; i < 10; ++i)
+        row2.push_back(i);
+    array2d.push_back(row2);
+    print2DArray(array2d);
 }
 
 void task3() {
@@ -72,29 +78,53 @@ void task3() {
     std::cin >> rows;
     std::cin >> cols;
 
-    rassert(rows <= 20, 7448989892);
-    rassert(rows >= 1, 428702438);
-    rassert(cols >= 1, 32879048912);
-    rassert(cols <= 20, 121212121212049);
-
+    std::vector<std::vector<int>> array2d(rows);
+    rassert(!((1 > rows) || (rows > 20)), 1);
+    rassert(!((1 > cols) || (cols > 20)), 1);
+    for (auto & e : array2d)
+        e.resize(cols);
+    while (true) {
+        int i, j;
+        std::cin >> i >> j;
+        if (i < 0 || 0 > j)
+            break;
+        array2d[i][j]++;
+        print2DArray(array2d);
+        for (auto & e : array2d) {
+            bool row = true;
+            for (auto &ee: e)
+                if (ee != 1)
+                    row = false;
+            if (row)
+            {
+                std::cout << "OX-XO-XO";
+                break;
+            }
+        }
+        for (int jj = 0; jj < cols; ++jj)
+        {
+            bool col = true;
+            for (int ii = 0; ii < rows; ++ii)
+            {
+                if (array2d[ii][jj] != 1)
+                    col = false;
+            }
+            if (col)
+            {
+                std::cout << "AX-AX-AX";
+                break;
+            }
+        }
+    }
     // TODO 33 проверьте с помощью rassert что оба числа в корректном диапазоне (от 1 до 20), проверьте что если ввести плохое число - проверка срабатывает и пишет ошибку (можете использовать как число, так и сообщение)
 
     // TODO 34 создайте двумерный массив состоящий из rows векторов
 
-    std::vector<int> array1;
-    array1.push_back(rows);
-    array1.resize(cols);
     // TODO 35 сделайте так чтобы каждый из этих rows векторов был размера cols (используйте resize)
 
     // TODO 36 как думаете какие элементы сейчас лежат в двумерном массиве? проверьте выведя его в консоль
 
     // TODO 37 ваша программа должна считывать пары чисел i, j в вечном цикле до тех пор пока i и j не отрицательны
-    while (true) {
-        int i;
-        int j;
-        std::cin >> i;
-        std::cin >> j;
-    }
 //        // TODO 38 считав очередное i, j - увеличьте ячейку в думерном массиве находящуюся в i-ой колонке, в j-ом ряду
 //        // TODO 39 выведите в консоль текущее состояние двумерного массива
 //        // TODO 40 добавьте проверку что если пользователь заполнил единицами хотя бы один ряд - то выводится сообщение "OX-XO-XO" и программа завершается
