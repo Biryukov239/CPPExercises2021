@@ -11,8 +11,8 @@ void task1() {
     rassert(!imgUnicorn.empty(), 3428374817241); // проверяем что картинка загрузилась (что она не пустая)
 
     // TODO выведите в консоль разрешение картинки (ширина x высота)
-    int width = 0; // как в ООП - у картинки есть поля доступные через точку, они называются cols и rows - попробуйте их
-    int height = 0;
+    int width = imgUnicorn.cols; // как в ООП - у картинки есть поля доступные через точку, они называются cols и rows - попробуйте их
+    int height = imgUnicorn.rows;
     std::cout << "Unicorn image loaded: " << width << "x" << height << std::endl;
 
     // создаем папку в которую будем сохранять результаты - lesson03/resultsData/
@@ -21,17 +21,29 @@ void task1() {
         std::filesystem::create_directory(resultsDir); // то создаем ее
     }
 
-    cv::Mat blueUnicorn = makeAllBlackPixelsBlue(imgUnicorn); // TODO реализуйте функцию которая каждый пиксель картинки который близок к белому - делает синим
+    cv::Mat blueUnicorn = makeAllBlackPixelsBlue(imgUnicorn.clone()); // TODO реализуйте функцию которая каждый пиксель картинки который близок к белому - делает синим
     std::string filename = resultsDir + "01_blue_unicorn.jpg"; // удобно в начале файла писать число, чтобы файлы были в том порядке в котором мы их создали
     cv::imwrite(filename, blueUnicorn);
 
-    cv::Mat invertedUnicorn = invertImageColors(imgUnicorn); // TODO реализуйте функцию которая каждый цвет картинки инвертирует
+    cv::Mat invertedUnicorn = invertImageColors(imgUnicorn.clone()); // TODO реализуйте функцию которая каждый цвет картинки инвертирует
     // TODO сохраните резльутат в ту же папку, но файл назовите "02_inv_unicorn.jpg"
+    filename = resultsDir + "02_inv_unicorn.jpg";
+    cv::imwrite(filename, invertedUnicorn);
 
-//    cv::Mat castle; // TODO считайте с диска картинку с замком - castle.png
-//    cv::Mat unicornInCastle = addBackgroundInsteadOfBlackPixels(imgUnicorn, castle); // TODO реализуйте функцию которая все черные пиксели картинки-объекта заменяет на пиксели с картинки-фона
+    cv::Mat castle = cv::imread("lesson03/data/castle.png"); // TODO считайте с диска картинку с замком - castle.png
+    cv::Mat unicornInCastle = addBackgroundInsteadOfBlackPixels(imgUnicorn, castle); // TODO реализуйте функцию которая все черные пиксели картинки-объекта заменяет на пиксели с картинки-фона
     // TODO сохраните результат в ту же папку, назовите "03_unicorn_castle.jpg"
+    filename = resultsDir + "03_unicorn_castle.jpg";
+    cv::imwrite(filename, unicornInCastle);
 
+    cv::Mat largeCastle = cv::imread("lesson03/data/castle_large.jpg");
+    cv::Mat largeCastle2 = addBackgroundInsteadOfBlackPixelsLargeBackground(imgUnicorn.clone(), largeCastle.clone());
+    filename = resultsDir + "04_unicorn_large_castle.jpg"; // удобно в начале файла писать число, чтобы файлы были в том порядке в котором мы их создали
+    cv::imwrite(filename, largeCastle2);
+
+    largeCastle2 = addBackgroundInsteadOfBlackPixelsLargeBackgroundNTimes(imgUnicorn.clone(), largeCastle.clone());
+    filename = resultsDir + "05_unicorns_otake.jpg"; // удобно в начале файла писать число, чтобы файлы были в том порядке в котором мы их создали
+    cv::imwrite(filename, largeCastle2);
 //    cv::Mat largeCastle; // TODO считайте с диска картинку с большим замком - castle_large.png
 //    cv::Mat unicornInLargeCastle = addBackgroundInsteadOfBlackPixelsLargeBackground(imgUnicorn, largeCastle); // TODO реализуйте функцию так, чтобы нарисовался объект ровно по центру на данном фоне, при этом черные пиксели объекта не должны быть нарисованы
     // TODO сохраните результат - "04_unicorn_large_castle.jpg"
@@ -45,12 +57,17 @@ void task1() {
     // 5) при этом каждый единорог рисуется по случайным координатам
     // 6) результат сохраните - "05_unicorns_otake.jpg"
 
+    largeCastle2 = fillBackground(imgUnicorn.clone(), largeCastle.clone());
+    filename = resultsDir + "06_unicorns_upscale.jpg"; // удобно в начале файла писать число, чтобы файлы были в том порядке в котором мы их создали
+    cv::imwrite(filename, largeCastle2);
     // TODO растяните картинку единорога так, чтобы она заполнила полностью большую картинку с замком "06_unicorn_upscale.jpg"
 }
 
 void task2() {
     cv::Mat imgUnicorn = cv::imread("lesson03/data/unicorn.png");
     rassert(!imgUnicorn.empty(), 3428374817241);
+    cv::Mat imgUnicornOriginal = cv::imread("lesson03/data/unicorn.png");
+    rassert(!imgUnicornOriginal.empty(), 3428374817241);
 
     // cv::waitKey - функция некоторое время ждет не будет ли нажата кнопка клавиатуры, если да - то возвращает ее код
     int updateDelay = 10; // указываем сколько времени ждать нажатия кнопки клавиатуры - в миллисекундах
@@ -59,6 +76,22 @@ void task2() {
 
         // кроме сохранения картинок на диск (что часто гораздо удобнее конечно, т.к. между ними легко переключаться)
         // иногда удобно рисовать картинку в окне:
+        cv::Mat imgUnicorn = imgUnicornOriginal.clone();
+        for(int i = 0; i < imgUnicorn.rows; i++) {
+            for(int j = 0; j < imgUnicorn.cols; j++) {
+                cv::Vec3b color = imgUnicorn.at<cv::Vec3b>(i, j);
+                unsigned char blue = color[0];
+                unsigned char green = color[1];
+                unsigned char red = color[2];
+                if (blue == 0 && green == 0 && red == 0) {
+                    blue = rand() % 0xff;
+                    red = rand() % 0xff;
+                    green = rand() % 0xff;
+                }
+                imgUnicorn.at<cv::Vec3b>(i, j) = cv::Vec3b(blue, green, red);
+
+            }
+        }
         cv::imshow("lesson03 window", imgUnicorn);
         // TODO сделайте функцию которая будет все черные пиксели (фон) заменять на случайный цвет (аккуратно, будет хаотично и ярко мигать, не делайте если вам это противопоказано)
     }
@@ -66,8 +99,10 @@ void task2() {
 
 struct MyVideoContent {
     cv::Mat frame;
+    //vector<pair<int,int>> history;
     int lastClickX;
     int lastClickY;
+    bool inverted = false;
 };
 
 void onMouseClick(int event, int x, int y, int flags, void *pointerToMyVideoContent) {
@@ -79,6 +114,7 @@ void onMouseClick(int event, int x, int y, int flags, void *pointerToMyVideoCont
 
     if (event == cv::EVENT_LBUTTONDOWN) { // если нажата левая кнопка мыши
         std::cout << "Left click at x=" << x << ", y=" << y << std::endl;
+
     }
 }
 
