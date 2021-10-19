@@ -73,8 +73,8 @@ cv::Mat sobelDXY(cv::Mat gray) {
     };
 
     // TODO доделайте этот код (в т.ч. производную по оси ty), в нем мы пробегаем по всем пикселям (j,i)
-    for (int j = 0; j < height; ++j) {
-        for (int i = 0; i < width; ++i) {
+    for (int j = 1; j < height-1; ++j) {
+        for (int i = 1; i < width-1; ++i) {
             float dxSum = 0.0f;// судя будем накапливать производную по оси x
             float dySum = 0.0f;
 
