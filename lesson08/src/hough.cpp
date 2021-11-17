@@ -32,7 +32,7 @@ cv::Mat buildHough(cv::Mat sobel) {// единственный аргумент 
     int max_theta = 360;
 
     // решаем какое максимальное значение у параметра r в нашем пространстве прямых:
-    int max_r = width + height;
+    int max_r = sqrt(width * width + height * height);
 
     // создаем картинку-аккумулятор, в которой мы будем накапливать суммарные голоса за прямые
     // так же известна как пространство Хафа
@@ -50,8 +50,10 @@ cv::Mat buildHough(cv::Mat sobel) {// единственный аргумент 
 
                 double theta0radians = toRadians(theta0);
                 int r0 = (int) round(estimateR(x0, y0, theta0radians)); // оцениваем r0 и округляем его до целого числа
-                if (r0 < 0 || r0 >= max_r)
+                if (r0 < 0 || r0 >= max_r) {
+
                     continue;
+                }
 
                 int theta1 = theta0 + 1;
                 double theta0radians1 = toRadians(theta1);

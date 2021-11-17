@@ -55,7 +55,7 @@ void test(std::string name) {
     }
 
     cv::Mat blurredHough;
-    int blurX = 5; // ширина сглаживания - по оси X
+    int blurX = 3; // ширина сглаживания - по оси X
     int blurY = blurX * hough.rows / hough.cols;
     if (blurY % 2 == 0) {
         blurY = blurY + 1;
@@ -65,7 +65,7 @@ void test(std::string name) {
     }    cv::blur(hough, blurredHough, cv::Size(blurX, blurY)); // сглаживаем пространство Хафа (сглаженный результат в blurredHough)
     hough = blurredHough; // заменяем сырое пространство Хафа на сглаженное
 // и сохраянем его визуализацию на диск:
-    cv::imwrite("lesson08/resultsData/" + name + "_3_hough_blurred.png", hough*255.0f/max_accumulated);
+    cv::imwrite("lesson08/resultsData/" + name + "_3_hough_blurred.png", hough);
 
 
     // заменим каждый пиксель с яркости X на яркость X*255.0f/max_accumulated (т.е. уменьшим диапазон значений)

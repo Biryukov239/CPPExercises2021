@@ -29,6 +29,23 @@ std::vector<PolarLineExtremum> findLocalExtremums(cv::Mat houghSpace)
 std::vector<PolarLineExtremum> filterStrongLines(std::vector<PolarLineExtremum> allLines, double thresholdFromWinner)
 {
     // TODO скопируйте сюда свою реализацию фильтрации сильных прямых из прошлого задания - lesson08
+    std::vector<PolarLineExtremum> strongLines;
+
+    // Эта функция по множеству всех найденных локальных экстремумов (прямых) находит самую популярную прямую
+    // и возвращает только вектор из тех прямых, что не сильно ее хуже (набрали хотя бы thresholdFromWinner голосов от победителя, т.е. например половину)
+
+    PolarLineExtremum strongestLine = allLines[0];
+    for(PolarLineExtremum line: allLines){
+        if(line.votes > strongestLine.votes) strongestLine = line;
+    }
+
+    for(PolarLineExtremum line: allLines){
+        if(strongestLine.votes * thresholdFromWinner <= line.votes){
+            strongLines.push_back(line);
+        }
+    }
+
+    return strongLines;
 }
 
 cv::Mat drawCirclesOnExtremumsInHoughSpace(cv::Mat houghSpace, std::vector<PolarLineExtremum> lines, int radius)
