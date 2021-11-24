@@ -17,10 +17,10 @@ HoG buildHoG(cv::Mat grad_x, cv::Mat grad_y) {
     int height = grad_x.rows;
     int width = grad_x.cols;
 
-    HoG hog;
+    HoG hog(NBINS, 0);
 
     // TODO
-    // 1) увеличьте размер вектора hog до NBINS (ведь внутри это просто обычный вектор вещественных чисел)
+    // 1) увеличьте размер вектора hog до NBINS (ведь внутри это просто обычный вектор вещественных чисел)-
     // 2) заполните его нулями
     // 3) пробегите по всем пикселям входной картинки и посмотрите на каждый градиент
     // (определенный двумя числами: dx проекцией на ось x в grad_x, dy проекцией на ось y в grad_y)
@@ -37,8 +37,11 @@ HoG buildHoG(cv::Mat grad_x, cv::Mat grad_y) {
             if (strength < 10) // пропускайте слабые градиенты, это нужно чтобы игнорировать артефакты сжатия в jpeg (например в line01.jpg пиксели не идеально белые/черные, есть небольшие отклонения)
                 continue;
 
+            float a = atan2(dy, dx);
+            float d = 2 * M_PI / NBINS;
+
             // TODO рассчитайте в какую корзину нужно внести голос
-            int bin = -1;
+            int bin = (int) (a / d);
 
             rassert(bin >= 0, 3842934728039);
             rassert(bin < NBINS, 34729357289040);
@@ -47,6 +50,9 @@ HoG buildHoG(cv::Mat grad_x, cv::Mat grad_y) {
     }
 
     rassert(hog.size() == NBINS, 23478937290010);
+    float s = 0;
+    for (auto &elem : hog) s += elem;
+    for (auto &elem : hog) elem /= s;
     return hog;
 }
 
@@ -77,9 +83,10 @@ std::ostream &operator<<(std::ostream &os, const HoG &hog) {
     rassert(hog.size() == NBINS, 234728497230016);
 
     // TODO
+    float del = M_PI * 2 / NBINS;
     os << "HoG[";
     for (int bin = 0; bin < NBINS; ++bin) {
-//        os << angleInDegrees << "=" << percentage << "%, ";
+          os << del * (2.0 * del + 1.0) << "=" << hog [bin] * 100 << "%, ";
     }
     os << "]";
     return os;
@@ -95,6 +102,8 @@ double distance(HoG a, HoG b) {
     rassert(b.size() == NBINS, 237281947230078);
 
     // TODO рассчитайте декартово расстояние (т.е. корень из суммы квадратов разностей)
+
+
     // подумайте - как можно добавить независимость (инвариантность) гистаграммы градиентов к тому насколько контрастная или блеклая картинка?
     // подсказка: на контрастной картинке все градиенты гораздо сильнее, а на блеклой картинке все градиенты гораздо слабее, но пропорции между градиентами (распроцентовка) не изменны!
 
