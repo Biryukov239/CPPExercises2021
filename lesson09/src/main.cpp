@@ -8,7 +8,6 @@
 
 
 void test(std::string name) {
-    // TODO 1 скопируйте сюда функцию test из предыдущего задания (lesson08)
     std::cout << "Processing image " << name << ".jpg..." << std::endl;
 
     std::string full_path = "lesson05/data/" + name + ".jpg";
@@ -56,7 +55,7 @@ void test(std::string name) {
     }
 
     cv::Mat blurredHough;
-    int blurX = 10; // ширина сглаживания - по оси X
+    int blurX = 5; // ширина сглаживания - по оси X
     int blurY = blurX * hough.rows / hough.cols;
     if (blurY % 2 == 0) {
         blurY = blurY + 1;
@@ -72,12 +71,8 @@ void test(std::string name) {
     // заменим каждый пиксель с яркости X на яркость X*255.0f/max_accumulated (т.е. уменьшим диапазон значений)
     cv::imwrite("lesson09/resultsData/" + name + "_2_hough_normalized.png", hough*255.0f/max_accumulated);
 
-    // TODO здесь может быть полезно сгладить пространство Хафа, см. комментарии на сайте - https://www.polarnick.com/blogs/239/2021/school239_11_2021_2022/2021/11/09/lesson9-hough2-interpolation-extremum-detection.html
-
-    // TODO реализуйте функцию которая ищет и перечисляет локальные экстремумы - findLocalExtremums(...)
     std::vector<PolarLineExtremum> lines = findLocalExtremums(hough);
 
-    // TODO реализуйте фильтрацию прямых - нужно оставлять только те прямые, у кого много голосов (реализуйте функцию filterStrongLines(...) ):
     double thresholdFromWinner = 0.5; // хотим оставить только те прямые у кого не менее половины голосов по сравнению с самой популярной прямой
     lines = filterStrongLines(lines, thresholdFromWinner, hough.rows);
 
@@ -85,17 +80,15 @@ void test(std::string name) {
     for (int i = 0; i < lines.size(); ++i) {
         std::cout << "  Line #" << (i + 1) << " theta=" << lines[i].theta << " r=" << lines[i].r << " votes=" << lines[i].votes << std::endl;
     }
-
-    // TODO 2 не забудьте заменить lesson08 в путях отладочных картинок на lesson09:
     // Ctrl+R (это как Ctrl+F но для автоматической замены) -> lesson08 -> lesson09 -> Replace All
 
     // TODO 3 раскоментируйте эти куски кода и реализуйте эти две функции (обозначение экстремумов в пространстве Хафа и затем рисование самих прямых)
-//    int radius = 5;
-//    cv::Mat houghWithCircles = drawCirclesOnExtremumsInHoughSpace(hough*255.0f/max_accumulated, lines, radius);
-//    cv::imwrite("lesson09/resultsData/" + name + "_4_hough_circles.png", houghWithCircles);
-//
-//    cv::Mat imgWithLines = drawLinesOnImage(img, lines);
-//    cv::imwrite("lesson09/resultsData/" + name + "_5_lines.png", imgWithLines);
+    int radius = 5;
+    cv::Mat houghWithCircles = drawCirclesOnExtremumsInHoughSpace(hough*255.0f/max_accumulated, lines, radius);
+    cv::imwrite("lesson09/resultsData/" + name + "_4_hough_circles.png", houghWithCircles);
+
+    cv::Mat imgWithLines = drawLinesOnImage(img, lines);
+    cv::imwrite("lesson09/resultsData/" + name + "_5_lines.png", imgWithLines);
 }
 
 
@@ -124,4 +117,3 @@ int main() {
         return 1;
     }
 }
-
