@@ -2,7 +2,7 @@
 #include <iostream>
 #include <libutils/rasserts.h>
 
-#include "hog.h"
+#include "../../lesson11/src/hog.h"
 
 #include <opencv2/imgproc.hpp>
 
