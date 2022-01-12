@@ -10,10 +10,11 @@ double Line::getYFromX(double x)
 {
     rassert(b != 0.0, 2734832748932790061); // случай вертикальной прямой не рассматривается для простоты
 
-    // TODO 01
-    double y = 1.0;
+    // TODO 01;
 
-    return y;
+    double y;
+
+    return y = (a * x + c) / (-b);
 }
 
 std::vector<cv::Point2f> Line::generatePoints(int n,
@@ -22,21 +23,21 @@ std::vector<cv::Point2f> Line::generatePoints(int n,
 {
     std::vector<cv::Point2f> points;
 
-    // пусть зерно случайности порождающее последовательность координат будет однозначно опредляться по числу точек
+    // пусть зерно случайности порождающее последовательность координат будет однозначно определяться по числу точек
     unsigned int randomSeed = n;
     std::mt19937 randomGenerator(randomSeed); // это генератор случайных чисел (см. https://en.cppreference.com/w/cpp/numeric/random/mersenne_twister_engine )
 
     // TODO 01 доделайте этот метод:
     //  - поправьте в коде ниже количество точек которые создадутся
     //  - диапазон x в котором создаются точки
-    for (int i = 0; i < 5; ++i) {
+    for (int i = 0; i < n; ++i) {
         // это правило генерации случайных чисел - указание какие мы хотим координаты x - равномерно распределенные в диапазоне от fromX  до toX
-        std::uniform_real_distribution<> xDistribution(2.0, 5.0);
+        std::uniform_real_distribution<> xDistribution(fromX, toX);
 
         double x = xDistribution(randomGenerator);
 
         // найдем идеальную координату y для данной координаты x:
-        double idealY = x; // TODO 01 воспользуйтесь методом getYFromX (сначала его надо доделать)
+        double idealY = getYFromX(x); // TODO 01 воспользуйтесь методом getYFromX (сначала его надо доделать)
 
         // указание какую мы хотим координату y - распределенную около idealY в соответствии с распределением Гаусса (т.н. нормальное распределение)
         std::normal_distribution<> yDistribution(idealY, gaussianNoiseSigma);
