@@ -7,8 +7,8 @@
 void plotPoints(cv::Mat &img, const std::vector<cv::Point2f>& points, double scale, const cv::Scalar& color);
 
 std::vector<cv::Point2f> generateRandomPoints(int n,
-                                          double fromX, double toX,
-                                          double fromY, double toY);
+                                              double fromX, double toX,
+                                              double fromY, double toY);
 
 // этот тип описывает прямую - множество таких точек x,y что выполняется уравнение вида a*x+b*y+c=0
 class Line {
@@ -22,8 +22,8 @@ public:
     [[nodiscard]] double getYFromX(double x) const; // метод прямой позволяющий рассчитать точку на прямой (найти y по x)
 
     std::vector<cv::Point2f> generatePoints(int n,
-                                        double fromX, double toX,
-                                        double gaussianNoiseSigma); // метод прямой генерирующий n точек неподалеку от прямой
+                                            double fromX, double toX,
+                                            double gaussianNoiseSigma); // метод прямой генерирующий n точек неподалеку от прямой
     [[nodiscard]] double d(const cv::Point2f& p) const;
 };
 

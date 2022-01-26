@@ -5,6 +5,8 @@
 #include <opencv2/imgproc.hpp>
 
 #include <random>
+#include <iostream>
+#include <minmax.h>
 
 double Line::getYFromX(double x) const {
     rassert(b != 0.0, 2734832748932790061); // случай вертикальной прямой не рассматривается для простоты
@@ -52,8 +54,8 @@ void plotPoints(cv::Mat &img, const std::vector<cv::Point2f> &points, double sca
         float maxX = 0.0f;
         float maxY = 0.0f;
         for (auto &point: points) {
-            maxX = std::max(maxX, point.x);
-            maxY = std::max(maxY, point.y);
+            maxX = max(maxX, point.x);
+            maxY = max(maxY, point.y);
         }
         cv::Scalar black(0, 0, 0);
         // увеличим на 10% размер картинки чтобы точки были не совсем на краю
@@ -92,7 +94,7 @@ void Line::plot(cv::Mat &img, double scale, const cv::Scalar &color) const {
 }
 
 double Line::d(const cv::Point2f &p) const {
-    return pow(abs(p.x * a + p.y * b + c), 2) / (a * a + b * b);
+    return pow(abs(p.x * a + p.y * b + c) / (a * a + b * b), 2);
 }
 
 Line fitLineFromTwoPoints(const cv::Point2f &a, const cv::Point2f &b) {
@@ -103,22 +105,17 @@ Line fitLineFromTwoPoints(const cv::Point2f &a, const cv::Point2f &b) {
 Line fitLineFromNPoints(const std::vector<cv::Point2f> &points) {
     Line res = fitLineFromTwoPoints(points[0], points[1]);
     double min_sum = 0;
-    for (auto & p : points)
-    {
-        min_sum += res.d(p);
+    for (auto & r : points){
+        min_sum += res.d(r);
     }
-    for (int i = 0; i < points.size(); ++i)
-    {
-        for (int j = i + 1; j < points.size(); ++j)
-        {
+    for (int i = 0; i < points.size(); ++i){
+        for (int j = i + 1; j < points.size(); ++j){
             Line line = fitLineFromTwoPoints(points[i], points[j]);
             double sum = 0;
-            for (auto & p : points)
-            {
+            for (auto & p : points){
                 sum += line.d(p);
             }
-            if (sum < min_sum)
-            {
+            if (sum < min_sum){
                 min_sum = sum;
                 res = line;
             }
@@ -128,19 +125,34 @@ Line fitLineFromNPoints(const std::vector<cv::Point2f> &points) {
 }
 
 Line fitLineFromNNoisyPoints(const std::vector<cv::Point2f> &points) {
-    // TODO 06 БОНУС - реализуйте построение прямой по многим точкам включающим нерелевантные (такое чтобы прямая как можно лучше учитывала НАИБОЛЬШЕЕ число точек)
-
-    for (int i = 0; i < 1000; i++) {
-
+    Line res{0,0,0};
+    int max_inl = -1;
+    double min_y = DBL_MAX;
+    double max_y = 0;
+    for (const auto & point : points)
+    {
+        min_y = min(min_y, point.y);
+        max_y = max(max_y, point.y);
+    }
+    for (int i = 0; i < 10000; ++i)
+    {
         int i1 = std::abs(rand()) % points.size();
         int i2 = std::abs(rand()) % points.size();
-
-        Line l = fitLineFromTwoPoints(points[i1], points[i2]);
-
-
+        while (i2 == i1) i2 = std::abs(rand()) % points.size();
+        Line line = fitLineFromTwoPoints(points[i1], points[i2]);
+        int inl = 0;
+        for (const auto & point : points)
+        {
+            if (pow(point.y - line.getYFromX(point.x), 2) < 0.0005 * pow(min_y - max_y, 2))
+                ++inl;
+        }
+        if (max_inl < inl)
+        {
+            res = line;
+            max_inl = inl;
+        }
     }
-
-    return {0.0, -1.0, 2.0};
+    return res;
 }
 
 std::vector<cv::Point2f> generateRandomPoints(int n,
