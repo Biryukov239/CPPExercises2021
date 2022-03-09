@@ -11,15 +11,20 @@
 
 #include <libutils/rasserts.h>
 
-bool isPixelEmpty(cv::Vec3b color) {
+bool isPixelEmpty(const cv::Vec3b &color) {
     // TODO 1 реализуйте isPixelEmpty(color):
     // - верните true если переданный цвет - полностью черный (такие пиксели мы считаем пустыми)
     // - иначе верните false
-    rassert(false, "325235141242153: You should do TODO 1 - implement isPixelEmpty(color)!");
-    return true;
+    return color == cv::Vec3b(0, 0, 0);
 }
 
-void run(std::string caseName) {
+double distance(const cv::Vec3b &color1, const cv::Vec3b &color2) {
+    double s = (color1[0] - color2[0]) * (color1[0] - color2[0]) + (color1[1] - color2[1]) * (color1[1] - color2[1]) +
+               (color1[2] - color2[2]) * (color1[2] - color2[2]);
+    return sqrt(s);
+}
+
+void run(const std::string &caseName) {
     cv::Mat img0 = cv::imread("lesson16/data/" + caseName + "/0.png");
     cv::Mat img1 = cv::imread("lesson16/data/" + caseName + "/1.png");
     rassert(!img0.empty(), 324789374290018);
@@ -72,8 +77,9 @@ void run(std::string caseName) {
 
     // Находим матрицу преобразования второй картинки в систему координат первой картинки
     cv::Mat H10 = cv::findHomography(points1, points0, cv::RANSAC, 3.0);
-    rassert(H10.size() == cv::Size(3, 3), 3482937842900059); // см. документацию https://docs.opencv.org/4.5.1/d9/d0c/group__calib3d.html#ga4abc2ece9fab9398f2e560d53c8c9780
-                                                                             // "Note that whenever an H matrix cannot be estimated, an empty one will be returned."
+    rassert(H10.size() == cv::Size(3, 3),
+            3482937842900059); // см. документацию https://docs.opencv.org/4.5.1/d9/d0c/group__calib3d.html#ga4abc2ece9fab9398f2e560d53c8c9780
+    // "Note that whenever an H matrix cannot be estimated, an empty one will be returned."
 
     // создаем папку в которую будем сохранять результаты - lesson16/resultsData/ИМЯ_НАБОРА/
     std::string resultsDir = "lesson16/resultsData/";
@@ -136,8 +142,32 @@ void run(std::string caseName) {
     // - если ровно один их пикселей пустой - результат пусть идеально белый
     // - иначе пусть результатом будет оттенок серого - пусть он тем светлее, чем больше разница между цветами пикселей
     // При этом сделайте так чтобы самый сильно отличающийся пиксель - всегда был идеально белым (255), т.е. выполните нормировку с учетом того какая максимальная разница яркости присутствует
-    // Напоминание - вот так можно выставить цвет в пикселе:
-    //  panoDiff.at<cv::Vec3b>(j, i) = cv::Vec3b(blueValue, greenValue, redValue);
+    // Напоминание - вот так можно выставить цвет в пикселеc3b>(j, i) = cv::Vec3b(blueValue, greenValue, redValue);
+    double m = 0;
+    for (int j = 0; j < pano_cols; j++) {
+        for (int i = 0; i < pano_rows; i++) {
+            double d = distance(pano0.at<cv::Vec3b>(i, j), pano1.at<cv::Vec3b>(i, j));
+            if (d > m) {
+                m = d;
+            }
+        }
+    }
+    cv::Vec3b white(255, 255, 255);
+    cv::Vec3b black(0, 0, 0);
+    for (int j = 0; j < pano_cols; j++) {
+        for (int i = 0; i < pano_rows; i++) {
+            if (isPixelEmpty(pano1.at<cv::Vec3b>(i, j)) && isPixelEmpty(pano0.at<cv::Vec3b>(i, j))) {
+                panoDiff.at<cv::Vec3b>(i, j) = black;
+                continue;
+            }
+            if (isPixelEmpty(pano1.at<cv::Vec3b>(i, j)) || isPixelEmpty(pano0.at<cv::Vec3b>(i, j))) {
+                panoDiff.at<cv::Vec3b>(i, j) = white;
+                continue;
+            }
+            int a = (int) (distance(pano0.at<cv::Vec3b>(i, j), pano1.at<cv::Vec3b>(i, j)) / m * 255);
+            panoDiff.at<cv::Vec3b>(i, j) = cv::Vec3b(a, a, a);
+        }
+    }
 
     cv::imwrite(resultsDir + "5panoDiff.jpg", panoDiff);
 }
@@ -148,7 +178,7 @@ int main() {
         run("1_hanging"); // TODO 3 проанализируйте результаты по фотографиям с дрона - где различие сильное, где малое? почему так?
         run("2_hiking"); // TODO 4 проанализируйте результаты по фотографиям с дрона - где различие сильное, где малое? почему так?
         run("3_aero"); // TODO 5 проанализируйте результаты по фотографиям с дрона - где различие сильное, где малое? почему так?
-        run("4_your_data"); // TODO 6 сфотографируйте что-нибудь сами при этом на второй картинке что-то изменив, проведите анализ
+
         // TODO 7 проведите анализ результатов на базе Вопросов-Упражнений предложенных в последней статье "Урок 19: панорама и визуализация качества склейки"
 
         return 0;
